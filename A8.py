@@ -11,10 +11,11 @@ penguins_data.species.value_counts()
 
 penguins_data.isnull().sum()
 
-for column_name in penguins_data.select_dtypes(include='float',exclude='object'):
-  penguins_data.loc[:,column_name].fillna(penguins_data.loc[:,column_name].mean(),axis=0,inplace=True)
+for column_name in penguins_data.select_dtypes(include='float', exclude='object'): 
+    # Fill missing values in the column with the mean and assign it back to the DataFrame
+    penguins_data[column_name] = penguins_data[column_name].fillna(penguins_data[column_name].mean(), axis=0)
 
-penguins_data.sex.fillna(method ='ffill', inplace = True)
+penguins_data['sex'] = penguins_data['sex'].fillna(method='ffill')
 
 
 sns.scatterplot(x='bill_length_mm',y='bill_depth_mm',hue='species',data=penguins_data,style='species');

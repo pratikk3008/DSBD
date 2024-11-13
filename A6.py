@@ -1,37 +1,59 @@
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+V = 4
 
+def print_solution(color):
+    print("Solution Exists: Following are the assigned colors")
+    print(" ".join(map(str, color)))
 
-data = pd.read_csv("DataSet/Assignment 9.csv")
+def is_safe(v, graph, color, c):
+    # Check if the color 'c' is safe for the vertex 'v'
+    for i in range(V):
+        if graph[v][i] and c == color[i]:
+            return False
+    return True
 
+def graph_coloring_util(graph, m, color, v):
+    # Base case: If all vertices are assigned a color, return true
+    if v == V:
+        return True
 
-data.head()
+    # Try different colors for the current vertex 'v'
+    for c in range(1, m + 1):
+        # Check if assignment of color 'c' to 'v' is fine
+        if is_safe(v, graph, color, c):
+            color[v] = c
 
+            # Recur to assign colors to the rest of the vertices
+            if graph_coloring_util(graph, m, color, v + 1):
+                return True
 
-X = data.drop(columns=['medv'])  # Drop the target column from features
-y = data['medv']  # Set target variable
+            # If assigning color 'c' doesn't lead to a solution, remove it
+            color[v] = 0
 
+    # If no color can be assigned to this vertex, return false
+    return False
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+def graph_coloring(graph, m):
+    color = [0] * V
 
+    # Call graph_coloring_util() for vertex 0
+    if not graph_coloring_util(graph, m, color, 0):
+        print("Solution does not exist")
+        return False
 
-model = LinearRegression()
-model.fit(X_train, y_train)
+    # Print the solution
+    print_solution(color)
+    return True
 
+# Driver code
+if __name__ == "__main__":
+    graph = [
+        [0, 1, 1, 1],
+        [1, 0, 1, 0],
+        [1, 1, 0, 1],
+        [1, 0, 1, 0],
+    ]
 
-y_pred = model.predict(X_test)
+    m = 3
 
-
-mae = mean_absolute_error(y_test, y_pred)
-mse = mean_squared_error(y_test, y_pred)
-rmse = np.sqrt(mse)
-r2 = r2_score(y_test, y_pred)
-
-
-print(f"Mean Absolute Error: {mae}")
-print(f"Mean Squared Error: {mse}")
-print(f"Root Mean Squared Error: {rmse}")
-print(f"R-squared: {r2}")
+    # Function call
+    graph_coloring(graph, m)
